@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "fr.bmartel.android.iotf.app"
+        minSdkVersion 17
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        debug {
+            buildConfigField "String", "BLUEMIX_IOT_ORG", "\"$System.env.BLUEMIX_IOT_ORG\""
+            buildConfigField "String", "BLUEMIX_API_KEY", "\"$System.env.BLUEMIX_API_KEY\""
+            buildConfigField "String", "BLUEMIX_API_TOKEN", "\"$System.env.BLUEMIX_API_TOKEN\""
+        }
+        release {
+            buildConfigField "String", "BLUEMIX_IOT_ORG", "\"$System.env.BLUEMIX_IOT_ORG\""
+            buildConfigField "String", "BLUEMIX_API_KEY", "\"$System.env.BLUEMIX_API_KEY\""
+            buildConfigField "String", "BLUEMIX_API_TOKEN", "\"$System.env.BLUEMIX_API_TOKEN\""
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile project(':iotf-library')
+}
