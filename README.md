@@ -1,6 +1,7 @@
 # IoT Foundation for Android
 
 [![License](http://img.shields.io/:license-mit-blue.svg)](LICENSE.md)
+[![Build Status](https://travis-ci.org/akinaru/iotf-android.svg?branch=master)](https://travis-ci.org/akinaru/iotf-android)
 
 IBM IoT foundation Messaging library for Android
 
