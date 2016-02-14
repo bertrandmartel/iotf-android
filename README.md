@@ -136,24 +136,24 @@ All subscription API have two version : one with `boolean isRetained`, `QosPolic
 
 * For Applications and Scalable Applications
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| void subscribeDeviceEvents(String deviceType, String deviceId, String eventId)           | subscribe to device events                 |
-| void subscribeDeviceCommands(String deviceType, String deviceId, String commandId)       | subscribe to device commands               |
-| void subscribeDeviceStatus(String deviceType, String deviceId)                           | subscribe to device status                 |
-| void subscribeApplicationStatus(String appId)                                            | subscribe to application status            |
+| subscribeDeviceEvents(String deviceType, String deviceId, String eventId)           | subscribe to device events                 |
+| subscribeDeviceCommands(String deviceType, String deviceId, String commandId)       | subscribe to device commands               |
+| subscribeDeviceStatus(String deviceType, String deviceId)                           | subscribe to device status                 |
+| subscribeApplicationStatus(String appId)                                            | subscribe to application status            |
 
 * For Devices
 
 |  API prototype                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| void subscribeCommand(String commandId) |  subscribe to command ID|
+| subscribeCommand(String commandId) |  subscribe to command ID|
 
 * For Gateways (Beta)
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| void subscribeCommands(String deviceType, String deviceId, String commandId) |  subscribe to device command ID |
+| subscribeCommands(String deviceType, String deviceId, String commandId) |  subscribe to device command ID |
 
 wildcard "+" can be used to match all type of a specific parameter
 
@@ -168,24 +168,24 @@ will subscribe to all deviceType / device ID / eventId
 
 * For applications and Scalable Applications
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| void unsubscribeDeviceEvents(String deviceType, String deviceId, String eventId)     | unsubscribe device events                |
-| void unsubscribeDeviceCommands(String deviceType, String deviceId, String commandId) | unsubscribe device commands              |
-| void unsubscribeDeviceStatus(String deviceType, String deviceId) |  unsubscribe device status |
-| void unsubscribeApplicationStatus(String appId) | unsubscribe application status |
+| unsubscribeDeviceEvents(String deviceType, String deviceId, String eventId)     | unsubscribe device events                |
+| unsubscribeDeviceCommands(String deviceType, String deviceId, String commandId) | unsubscribe device commands              |
+| unsubscribeDeviceStatus(String deviceType, String deviceId) |  unsubscribe device status |
+| unsubscribeApplicationStatus(String appId) | unsubscribe application status |
 
 * For Devices
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
 | void unsubscribeCommand(String commandId) |  unsubscribe command ID |
 
-* For Gateways
+* For Gateways (Beta)
 
 |  API prototype                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| void unsubscribeCommands(String deviceType, String deviceId, String commandId) |  subscribe to device command ID |
+| unsubscribeCommands(String deviceType, String deviceId, String commandId) |  subscribe to device command ID |
 
 wildcard "+" can be used to match all type of a specific parameter
 
@@ -202,23 +202,23 @@ All subscription API have two version : one with `QosPolicy qos`, `IMqttActionLi
 
 * For applications
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| IMqttDeliveryToken publishDeviceEvents(String deviceType, String deviceId, String eventId, String message) | publish a device event on behalf of the device |
-| IMqttDeliveryToken publishDeviceCommands(String deviceType, String deviceId, String commandId, String message) | publish device commands |
+| publishDeviceEvents(String deviceType, String deviceId, String eventId, String message) | publish a device event on behalf of the device |
+| publishDeviceCommands(String deviceType, String deviceId, String commandId, String message) | publish device commands |
 
 * For Devices
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| IMqttDeliveryToken publishEvent(String eventId, String message) |  publish an event |
+| publishEvent(String eventId, String message) |  publish an event |
 
-* For Gateway
+* For Gateway (Beta)
 
-|  API prototype                                                                      |   description                              |
+|  API                                                                      |   description                              |
 |-------------------------------------------------------------------------------------|--------------------------------------------|
-| IMqttDeliveryToken publishOwnEvents(String eventId, String message) | publish an event on behalf of the gateway itself |
-| IMqttDeliveryToken publishDeviceEvents(String deviceType, String deviceId, String eventId, String message) | publish an event on behalf of a device |
+| publishOwnEvents(String eventId, String message) | publish an event on behalf of the gateway itself |
+| publishDeviceEvents(String deviceType, String deviceId, String eventId, String message) | publish an event on behalf of a device |
 
 ### Connection parameters
 
