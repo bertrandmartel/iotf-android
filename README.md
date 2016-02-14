@@ -45,7 +45,7 @@ mHandler = new AppScalableHandler(context, IOT_ORG, "MyApplicationID", API_KEY, 
 ```
 
 `ApplicationID` is a user defined unique string identifier for the client.<br/>
-`ApplicationID` cant be empty and cannot contains following characters : 
+`ApplicationID` cant be empty and cannot contain following characters : 
 * +
 * /
 * :
