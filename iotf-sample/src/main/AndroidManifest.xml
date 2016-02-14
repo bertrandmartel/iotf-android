@@ -2,11 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="fr.bmartel.android.iotf.app">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
@@ -27,8 +23,6 @@
         </activity>
 
         <activity android:name=".ConnectActivity"></activity>
-
-        <service android:name="org.eclipse.paho.android.service.MqttService" />
 
     </application>
 
