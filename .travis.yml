@@ -8,7 +8,7 @@ android:
     - tools
     - android-23
     - build-tools-23.0.2
-
+    - extra-android-m2repository
 cache: false
 # Use the Travis Container-Based Infrastructure (see #203)
 sudo: false
