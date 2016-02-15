@@ -35,13 +35,13 @@ compile 'akinaru:iotf-android:0.1'
 * Application
 
 ```
-mHandler = new AppHandler(context, IOT_ORG, "MyApplicationID", API_KEY, API_TOKEN);
+AppHandler mHandler = new AppHandler(context, IOT_ORG, "MyApplicationID", API_KEY, API_TOKEN);
 ```
 
 * Scalable Application
 
 ```
-mHandler = new AppScalableHandler(context, IOT_ORG, "MyApplicationID", API_KEY, API_TOKEN);
+AppScalableHandler mHandler = new AppScalableHandler(context, IOT_ORG, "MyApplicationID", API_KEY, API_TOKEN);
 ```
 
 `ApplicationID` is a user defined unique string identifier for the client.<br/>
@@ -54,13 +54,13 @@ mHandler = new AppScalableHandler(context, IOT_ORG, "MyApplicationID", API_KEY, 
 ### Devices
 
 ```
-mHandler = new DeviceHandler(context, IOT_ORG, DEVICE_TYPE, DEVICE_ID, AUTHENTICATION_TOKEN);
+DeviceHandler mHandler = new DeviceHandler(context, IOT_ORG, DEVICE_TYPE, DEVICE_ID, AUTHENTICATION_TOKEN);
 ```
 
 ### Gateway (still in Beta)
 
 ```
-mHandler = new GatewayHandler(context, IOT_ORG, GATEWAY_TYPE, GATEWAY_ID, AUTHENTICATION_TOKEN);
+GatewayHandler mHandler = new GatewayHandler(context, IOT_ORG, GATEWAY_TYPE, GATEWAY_ID, AUTHENTICATION_TOKEN);
 ```
 
 ### MQTT callback
