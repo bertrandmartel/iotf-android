@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="fr.bmartel.android.iotf.app">
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
@@ -12,17 +12,24 @@
         tools:replace="android:icon">
 
         <activity
-            android:name=".NotificationActivity"
+            android:name=".ConnectActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/json" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".ConnectActivity"></activity>
+        <activity android:name=".NotificationActivity"></activity>
 
     </application>
 

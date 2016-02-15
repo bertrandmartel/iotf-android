@@ -5,4 +5,10 @@
     <string name="organization">Organization ID</string>
     <string name="api_key">API Key</string>
     <string name="api_token">API token</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="about">About</string>
+    <string name="copyright">\u00a9 2016 Bertrand Martel</string>
+    <string name="github_link">https://github.com/akinaru/iotf-android</string>
+    <string name="open_source_items">Open Source components</string>
 </resources>
