@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="fr.bmartel.android.iotf.app">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/app_icon"
@@ -29,7 +32,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NotificationActivity"></activity>
+        <activity
+            android:name=".NotificationActivity"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="landscape"></activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 

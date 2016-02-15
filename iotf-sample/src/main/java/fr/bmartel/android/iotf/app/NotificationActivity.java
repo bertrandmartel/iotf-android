@@ -25,25 +25,97 @@ package fr.bmartel.android.iotf.app;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import fr.bmartel.android.iotf.handler.AppHandler;
+import java.util.ArrayList;
+import java.util.Date;
+
+import fr.bmartel.android.iotf.app.adapter.NotificationArrayAdapter;
+import fr.bmartel.android.iotf.app.model.IncomingMessage;
+import fr.bmartel.android.iotf.app.singleton.IotSingleton;
 import fr.bmartel.android.iotf.listener.IMessageCallback;
 
 /**
  * @author Bertrand Martel
  */
-public class NotificationActivity extends MainActivityAbstr {
+public class NotificationActivity extends BaseActivity {
 
     private static final String TAG = NotificationActivity.class.getSimpleName();
+
+    private ListView notificationListview;
+
+    private NotificationArrayAdapter notificationAdapter;
+
+    private ArrayList<IncomingMessage> notificationItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect);
+        setContentView(R.layout.activity_notifications);
+        initNv();
+        IotSingleton.getInstance(this).setInternalCb(new IMessageCallback() {
+            @Override
+            public void connectionLost(Throwable cause) {
+
+                if (!IotSingleton.getInstance(NotificationActivity.this).isAutoReconnect()) {
+                    Toast.makeText(NotificationActivity.this, "disconnected from server", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+
+                notificationItems.add(0, new IncomingMessage(new Date(), topic.substring(topic.indexOf("id/") + 6, topic.indexOf("/evt")), new String(mqttMessage.getPayload())));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        notificationAdapter.notifyDataSetChanged();
+                        triggerNotification("nouveau");
+                    }
+                });
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken messageToken) {
+
+            }
+
+            @Override
+            public void onConnectionSuccess() {
+
+            }
+
+            @Override
+            public void onConnectionFailure() {
+
+            }
+
+            @Override
+            public void onDisconnectionSuccess() {
+                Toast.makeText(NotificationActivity.this, "disconnected from server", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onDisconnectionFailure() {
+
+            }
+        });
+
+        notificationListview = (ListView) findViewById(R.id.notification_list);
+
+        notificationItems = new ArrayList<>();
+
+        notificationAdapter = new NotificationArrayAdapter(notificationItems);
+
+        notificationListview.setAdapter(notificationAdapter);
+
     }
 
     // Make sure this is the method with just `Bundle` as the signature
@@ -53,6 +125,17 @@ public class NotificationActivity extends MainActivityAbstr {
         drawerToggle.syncState();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.disconnect_button:
+                IotSingleton.getInstance(this).disconnect(false);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public void onResume() {
         super.onResume();
@@ -64,8 +147,18 @@ public class NotificationActivity extends MainActivityAbstr {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "application finished");
         super.onDestroy();
+        Log.d(TAG, "application finished");
+        IotSingleton.getInstance(this).disconnect(false);
     }
 
+    @Override
+    public String getToolbarTitle() {
+        return "Notifications";
+    }
+
+    @Override
+    public boolean isShowingDisconnectBtn() {
+        return true;
+    }
 }

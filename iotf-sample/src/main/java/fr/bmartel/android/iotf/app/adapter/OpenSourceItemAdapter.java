@@ -1,7 +1,6 @@
 package fr.bmartel.android.iotf.app.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,19 +16,13 @@ public class OpenSourceItemAdapter extends BaseAdapter {
 
     private static final String[][] COMPONENTS = new String[][]{
 
-            {"DiscreteSeekBar", "https://github.com/AnderWeb/discreteSeekBar"},
-            {"MPAndroidChart",
-                    "https://github.com/PhilJay/MPAndroidChart"},
-            {"nv-bluetooth", "https://github.com/TakahikoKawasaki/nv-bluetooth"},
-            {"RFDuino", "https://github.com/RFduino/RFduino"},
-            {"rfduino-makefile", "https://github.com/akinaru/rfduino-makefile"},
-            {"Material Design Icons", "https://github.com/google/material-design-icons"}
+            {"Eclipse Paho client", "http://www.eclipse.org/paho/"}
     };
 
-    private LayoutInflater mInflater;
+    private Context mContext;
 
     public OpenSourceItemAdapter(Context context) {
-        mInflater = LayoutInflater.from(context);
+        mContext = context;
     }
 
     @Override
@@ -49,19 +42,21 @@ public class OpenSourceItemAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.open_source_items, parent, false);
-        }
 
-        TextView title = (TextView) convertView.findViewById(R.id.title);
-        TextView url = (TextView) convertView.findViewById(R.id.url);
+        try {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        if (title != null && url != null) {
+            convertView = inflater.inflate(R.layout.open_source_items, parent, false);
+
+            TextView title = (TextView) convertView.findViewById(R.id.title);
+            TextView url = (TextView) convertView.findViewById(R.id.url);
+
             title.setText(COMPONENTS[position][0]);
             url.setText(COMPONENTS[position][1]);
-        } else {
-            Log.e("e", "error");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return convertView;
     }
+
 }
