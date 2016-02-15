@@ -17,7 +17,7 @@ public class IotSingleton {
 
     private String TAG = IotSingleton.class.getSimpleName();
 
-    private IotSingleton mInstance;
+    private static IotSingleton mInstance;
 
     private Context mContext;
 
@@ -27,11 +27,13 @@ public class IotSingleton {
 
     private IMessageCallback mIotCallback;
 
-    public IotSingleton getInstance(Context context) {
+    public static IotSingleton getInstance(Context context) {
         if (mInstance == null)
             mInstance = new IotSingleton(context);
         return mInstance;
     }
+
+    private IMessageCallback mInternalCb;
 
     private IotSingleton(Context context) {
         this.mContext = context;
@@ -43,7 +45,6 @@ public class IotSingleton {
 
     public void setupApplication(String appID, String orgID, String apiKey, String apiToken) {
 
-        exit = true;
         disconnect();
         if (mIotCallback != null) {
             mHandler.removeCallback(mIotCallback);
@@ -55,6 +56,10 @@ public class IotSingleton {
             @Override
             public void connectionLost(Throwable cause) {
                 Log.i(TAG, "connectionLost");
+
+                if (mInternalCb != null)
+                    mInternalCb.connectionLost(cause);
+
                 if (cause != null) {
                     Log.e(TAG, "connection lost : " + cause.getMessage());
                 }
@@ -68,11 +73,15 @@ public class IotSingleton {
 
             @Override
             public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                if (mInternalCb != null)
+                    mInternalCb.messageArrived(topic, mqttMessage);
                 Log.i(TAG, "messageArrived : " + topic + " : " + new String(mqttMessage.getPayload()));
             }
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken messageToken) {
+                if (mInternalCb != null)
+                    mInternalCb.deliveryComplete(messageToken);
                 try {
                     Log.i(TAG, "deliveryComplete : " + new String(messageToken.getMessage().getPayload()));
                 } catch (MqttException e) {
@@ -82,6 +91,8 @@ public class IotSingleton {
 
             @Override
             public void onConnectionSuccess() {
+                if (mInternalCb != null)
+                    mInternalCb.onConnectionSuccess();
                 exit = false;
                 Log.i(TAG, "subscribe to device events ...");
                 mHandler.subscribeDeviceEvents("+", "+", "+");
@@ -89,12 +100,14 @@ public class IotSingleton {
 
             @Override
             public void onConnectionFailure() {
-
+                if (mInternalCb != null)
+                    mInternalCb.onConnectionFailure();
             }
 
             @Override
             public void onDisconnectionSuccess() {
-
+                if (mInternalCb != null)
+                    mInternalCb.onDisconnectionSuccess();
                 if (exit) {
                     mHandler.removeCallback(mIotCallback);
                 }
@@ -102,13 +115,18 @@ public class IotSingleton {
 
             @Override
             public void onDisconnectionFailure() {
-
+                if (mInternalCb != null)
+                    mInternalCb.onDisconnectionFailure();
             }
         };
 
         mHandler.addIotCallback(mIotCallback);
 
         mHandler.setSSL(true);
+    }
+
+    public void setInternalCb(IMessageCallback callback) {
+        mInternalCb = callback;
     }
 
     public boolean connect() {

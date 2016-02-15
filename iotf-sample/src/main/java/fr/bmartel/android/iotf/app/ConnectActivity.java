@@ -23,20 +23,33 @@
  */
 package fr.bmartel.android.iotf.app;
 
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import fr.bmartel.android.iotf.app.constant.StorageConst;
 import fr.bmartel.android.iotf.app.menu.MenuUtils;
+import fr.bmartel.android.iotf.app.singleton.IotSingleton;
+import fr.bmartel.android.iotf.listener.IMessageCallback;
 
 /**
  * @author Bertrand Martel
@@ -51,33 +64,138 @@ public class ConnectActivity extends MainActivityAbstr {
         super.onCreate(savedInstance);
         setContentView(R.layout.activity_connect);
 
+        SharedPreferences sharedpreferences = getSharedPreferences(StorageConst.STORAGE_PROFILE, Context.MODE_PRIVATE);
+
         final Intent intent = getIntent();
-        final String action = intent.getAction();
 
-        if (Intent.ACTION_VIEW.equals(action)) {
-            Uri uri2 = intent.getData();
-            String uri = uri2.getEncodedPath() + "  complete: " + uri2.toString();
-            Log.i(TAG, "decoded : " + uri);
-        } else {
-            Log.d(TAG, "intent was something else: " + action);
+        String defaultOrgId = "";
+        String defaultApiKey = "";
+        String defaultApiToken = "";
+
+        if (BuildConfig.BLUEMIX_IOT_ORG != null)
+            defaultOrgId = BuildConfig.BLUEMIX_IOT_ORG;
+        if (BuildConfig.BLUEMIX_API_KEY != null)
+            defaultApiKey = BuildConfig.BLUEMIX_API_KEY;
+        if (BuildConfig.BLUEMIX_API_TOKEN != null)
+            defaultApiToken = BuildConfig.BLUEMIX_API_TOKEN;
+
+        String organizationId = sharedpreferences.getString(StorageConst.STORAGE_ORGANIZATION_ID, defaultOrgId);
+        String apiKey = sharedpreferences.getString(StorageConst.STORAGE_API_KEY, defaultApiKey);
+        String apiToken = sharedpreferences.getString(StorageConst.STORAGE_API_TOKEN, defaultApiToken);
+        boolean ssl = sharedpreferences.getBoolean(StorageConst.STORAGE_USE_SSL, true);
+
+        boolean fromJsonFile = false;
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+
+            String jsonContent = loadFile(intent);
+
+            try {
+                JSONObject json = new JSONObject(jsonContent);
+
+                if (json.has(StorageConst.STORAGE_API_KEY) && json.has(StorageConst.STORAGE_API_TOKEN) &&
+                        json.has(StorageConst.STORAGE_ORGANIZATION_ID) && json.has(StorageConst.STORAGE_USE_SSL)) {
+
+                    organizationId = json.getString(StorageConst.STORAGE_ORGANIZATION_ID);
+                    apiKey = json.getString(StorageConst.STORAGE_API_KEY);
+                    apiToken = json.getString(StorageConst.STORAGE_API_TOKEN);
+                    ssl = json.getBoolean(StorageConst.STORAGE_USE_SSL);
+
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putString(StorageConst.STORAGE_ORGANIZATION_ID, organizationId);
+                    editor.putString(StorageConst.STORAGE_API_KEY, apiKey);
+                    editor.putString(StorageConst.STORAGE_API_TOKEN, apiToken);
+                    editor.putBoolean(StorageConst.STORAGE_USE_SSL, ssl);
+                    editor.commit();
+
+                    fromJsonFile = true;
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
         initNv();
 
         EditText organization = (EditText) findViewById(R.id.organization);
         EditText api_key = (EditText) findViewById(R.id.api_key);
         EditText api_token = (EditText) findViewById(R.id.api_token);
-        organization.setText(BuildConfig.BLUEMIX_IOT_ORG);
-        api_key.setText(BuildConfig.BLUEMIX_API_KEY);
-        api_token.setText(BuildConfig.BLUEMIX_API_TOKEN);
-
+        organization.setText(organizationId);
+        api_key.setText(apiKey);
+        api_token.setText(apiToken);
+        CheckBox sslCheckbox = (CheckBox) findViewById(R.id.ssl);
+        sslCheckbox.setChecked(ssl);
         mButtonConnect = (Button) findViewById(R.id.button_connect);
+
+        final String finalOrganizationId = organizationId;
+        final String finalApiKey = apiKey;
+        final String finalApiToken = apiToken;
         mButtonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG, "click");
+                IotSingleton.getInstance(ConnectActivity.this).setupApplication("MyActivity", finalOrganizationId, finalApiKey, finalApiToken);
+                IotSingleton.getInstance(ConnectActivity.this).connect();
             }
         });
+
+        final TextView error_log = (TextView) findViewById(R.id.error_log);
+
+        IotSingleton.getInstance(this).setInternalCb(new IMessageCallback() {
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken messageToken) {
+
+            }
+
+            @Override
+            public void onConnectionSuccess() {
+                //go to notification activity
+            }
+
+            @Override
+            public void onConnectionFailure() {
+                //display error message
+                error_log.setText("connection failure");
+            }
+
+            @Override
+            public void onDisconnectionSuccess() {
+
+            }
+
+            @Override
+            public void onDisconnectionFailure() {
+
+            }
+        });
+
+        if (fromJsonFile)
+            mButtonConnect.performClick();
+    }
+
+    private String loadFile(Intent intent) {
+        try {
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(getContentResolver().openInputStream(intent.getData())));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = buffer.readLine()) != null) {
+                sb.append(line);
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     protected void initNv() {
