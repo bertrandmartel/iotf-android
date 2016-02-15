@@ -23,49 +23,41 @@
  */
 package fr.bmartel.android.iotf.app;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-
-import fr.bmartel.android.iotf.handler.AppHandler;
-import fr.bmartel.android.iotf.listener.IMessageCallback;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.inputmethod.InputMethodManager;
 
 /**
- * @author Bertrand Martel
+ * Created by akinaru on 15/02/16.
  */
-public class NotificationActivity extends MainActivityAbstr {
+public abstract class MainActivityAbstr extends AppCompatActivity {
 
-    private static final String TAG = NotificationActivity.class.getSimpleName();
+    protected Toolbar toolbar = null;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect);
+    protected DrawerLayout mDrawer = null;
+
+    protected ActionBarDrawerToggle drawerToggle;
+
+    protected NavigationView nvDrawer;
+
+    protected Context mContext;
+
+    protected void onCreate(Bundle savedInstance) {
+        super.onCreate(savedInstance);
     }
 
-    // Make sure this is the method with just `Bundle` as the signature
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+    /**
+     * Hides the soft keyboard
+     */
+    public void hideSoftKeyboard() {
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
-
-
-    public void onResume() {
-        super.onResume();
-    }
-
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "application finished");
-        super.onDestroy();
-    }
-
 }
