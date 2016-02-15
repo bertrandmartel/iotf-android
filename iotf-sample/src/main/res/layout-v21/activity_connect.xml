@@ -119,7 +119,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dip"
-                    android:background="@color/default_color"
+                    android:background="@drawable/ripple"
                     android:fontFamily="sans-serif"
                     android:text="@string/validate"
                     android:textColor="#FFFFFF"

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- *
+ * <p/>
  * Copyright (c) 2016 Bertrand Martel
- *
+ * <p/>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p/>
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * <p/>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,8 +26,8 @@ package fr.bmartel.android.iotf.handler;
 import android.content.Context;
 import android.util.Log;
 
-import org.apache.commons.net.util.SSLContextUtils;
-import org.apache.commons.net.util.TrustManagerUtils;
+import com.google.android.gms.security.ProviderInstaller;
+
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -38,22 +38,15 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
+import fr.bmartel.android.iotf.R;
 import fr.bmartel.android.iotf.constant.ConnectionState;
 import fr.bmartel.android.iotf.constant.MessageFormat;
 import fr.bmartel.android.iotf.constant.MqttConst;
@@ -223,7 +216,7 @@ public abstract class IotHandlerAbstr implements IHandler {
 
             options.setUserName(mUsername);
             options.setPassword(mPassword.toCharArray());
-            
+
             if (mUseSsl) {
 
                 Log.d(TAG, "using ssl");
@@ -231,28 +224,20 @@ public abstract class IotHandlerAbstr implements IHandler {
                 serverURI = "ssl://" + mOrgId + "." + MqttConst.URL_SUFFIX + ":" + MqttConst.PORT_ENCRYPTED2;
 
                 try {
-                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                    Certificate ca = cf.generateCertificate(new ByteArrayInputStream(MqttConst.CERT_CHAIN));
+                    ProviderInstaller.installIfNeeded(mContext);
 
-                    KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    keyStore.load(null, null);
-                    keyStore.setCertificateEntry("ca", ca);
-                    TrustManager trustManager = TrustManagerUtils.getDefaultTrustManager(keyStore);
-                    SSLContext sslContext = SSLContextUtils.createSSLContext("TLSv1.2", null, trustManager);
+                    SSLContext sslContext;
+                    KeyStore ks = KeyStore.getInstance("bks");
+                    ks.load(mContext.getResources().openRawResource(R.raw.iot), "password".toCharArray());
+                    TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+                    tmf.init(ks);
+                    TrustManager[] tm = tmf.getTrustManagers();
+                    sslContext = SSLContext.getInstance("TLSv1.2");
+                    sslContext.init(null, tm, null);
 
                     options.setSocketFactory(sslContext.getSocketFactory());
 
-                } catch (CertificateException e) {
-                    e.printStackTrace();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                } catch (KeyStoreException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (GeneralSecurityException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else {

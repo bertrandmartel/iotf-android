@@ -29,13 +29,13 @@ dependencies {
         exclude module: 'support-v4'
     }
     compile 'com.android.support:support-v4:23.1.1'
-    compile 'akinaru:commons-net:3.3'
+    compile 'com.google.android.gms:play-services:6.5.87'
 }
 publish {
     userOrg = 'akinaru'
     groupId = 'akinaru'
     artifactId = 'iotf-android'
-    publishVersion = '0.1'
+    publishVersion = '0.2'
     desc = 'iotf android library Release'
     website = 'https://github.com/akinaru/iotf-android'
 }

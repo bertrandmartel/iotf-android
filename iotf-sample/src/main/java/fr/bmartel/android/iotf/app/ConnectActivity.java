@@ -27,15 +27,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -47,18 +43,22 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import fr.bmartel.android.iotf.app.constant.StorageConst;
-import fr.bmartel.android.iotf.app.menu.MenuUtils;
 import fr.bmartel.android.iotf.app.singleton.IotSingleton;
+import fr.bmartel.android.iotf.app.utils.RandomString;
 import fr.bmartel.android.iotf.listener.IMessageCallback;
 
 /**
  * @author Bertrand Martel
  */
-public class ConnectActivity extends MainActivityAbstr {
+public class ConnectActivity extends BaseActivity {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
 
     private Button mButtonConnect;
+
+    private RandomString randomId = new RandomString(30);
+
+    private TextView errorLogTv;
 
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
@@ -115,30 +115,66 @@ public class ConnectActivity extends MainActivityAbstr {
                 e.printStackTrace();
             }
         }
-        initNv();
 
-        EditText organization = (EditText) findViewById(R.id.organization);
-        EditText api_key = (EditText) findViewById(R.id.api_key);
-        EditText api_token = (EditText) findViewById(R.id.api_token);
+        ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
+
+        final EditText organization = (EditText) scrollView.findViewById(R.id.organization);
+        final EditText api_key = (EditText) scrollView.findViewById(R.id.api_key);
+        final EditText api_token = (EditText) scrollView.findViewById(R.id.api_token);
         organization.setText(organizationId);
         api_key.setText(apiKey);
         api_token.setText(apiToken);
-        CheckBox sslCheckbox = (CheckBox) findViewById(R.id.ssl);
+        final CheckBox sslCheckbox = (CheckBox) scrollView.findViewById(R.id.ssl);
         sslCheckbox.setChecked(ssl);
-        mButtonConnect = (Button) findViewById(R.id.button_connect);
+        final CheckBox reconnectCheckbox = (CheckBox) scrollView.findViewById(R.id.reconnect);
+        reconnectCheckbox.setChecked(true);
 
-        final String finalOrganizationId = organizationId;
-        final String finalApiKey = apiKey;
-        final String finalApiToken = apiToken;
+        mButtonConnect = (Button) scrollView.findViewById(R.id.button_connect);
+
         mButtonConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IotSingleton.getInstance(ConnectActivity.this).setupApplication("MyActivity", finalOrganizationId, finalApiKey, finalApiToken);
+                IotSingleton.getInstance(ConnectActivity.this).setupApplication(randomId.nextString(), organization.getText().toString(),
+                        api_key.getText().toString(), api_token.getText().toString(), sslCheckbox.isChecked(), reconnectCheckbox.isChecked());
                 IotSingleton.getInstance(ConnectActivity.this).connect();
             }
         });
 
-        final TextView error_log = (TextView) findViewById(R.id.error_log);
+        if (fromJsonFile) {
+            mButtonConnect.performClick();
+        }
+
+        initNv();
+    }
+
+    private String loadFile(Intent intent) {
+        try {
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(getContentResolver().openInputStream(intent.getData())));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = buffer.readLine()) != null) {
+                sb.append(line);
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    // Make sure this is the method with just `Bundle` as the signature
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        hideSoftKeyboard();
+
+        errorLogTv = (TextView) findViewById(R.id.error_log);
 
         IotSingleton.getInstance(this).setInternalCb(new IMessageCallback() {
 
@@ -159,13 +195,16 @@ public class ConnectActivity extends MainActivityAbstr {
 
             @Override
             public void onConnectionSuccess() {
+                errorLogTv.setText("");
                 //go to notification activity
+                Intent i = new Intent(ConnectActivity.this, NotificationActivity.class);
+                startActivity(i);
             }
 
             @Override
             public void onConnectionFailure() {
                 //display error message
-                error_log.setText("connection failure");
+                errorLogTv.setText("connection failure");
             }
 
             @Override
@@ -178,76 +217,15 @@ public class ConnectActivity extends MainActivityAbstr {
 
             }
         });
-
-        if (fromJsonFile)
-            mButtonConnect.performClick();
     }
 
-    private String loadFile(Intent intent) {
-        try {
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(getContentResolver().openInputStream(intent.getData())));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = buffer.readLine()) != null) {
-                sb.append(line);
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    protected void initNv() {
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar_item);
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Connection configuration");
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.inflateMenu(R.menu.toolbar_menu);
-
-        // Find our drawer view
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = setupDrawerToggle();
-
-        mDrawer.setDrawerListener(drawerToggle);
-
-        nvDrawer = (NavigationView) findViewById(R.id.nvView);
-        //nvDrawer.setVisibility(View.GONE);
-        //mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-        // Setup drawer view
-        setupDrawerContent(nvDrawer);
-    }
-
-    protected ActionBarDrawerToggle setupDrawerToggle() {
-        return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open, R.string.drawer_close);
-    }
-
-
-    protected void setupDrawerContent(NavigationView navigationView) {
-
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        MenuUtils.selectDrawerItem(menuItem, mDrawer, ConnectActivity.this);
-                        return true;
-                    }
-                });
-    }
-
-    // Make sure this is the method with just `Bundle` as the signature
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+    public String getToolbarTitle() {
+        return "Connection configuration";
     }
 
-    public void onResume() {
-        super.onResume();
-        hideSoftKeyboard();
+    @Override
+    public boolean isShowingDisconnectBtn() {
+        return false;
     }
 }

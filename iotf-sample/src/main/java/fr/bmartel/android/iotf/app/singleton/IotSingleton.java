@@ -25,7 +25,10 @@ public class IotSingleton {
 
     private boolean exit = false;
 
+    private boolean reconnectAuto = true;
+
     private IMessageCallback mIotCallback;
+    private boolean autoReconnect;
 
     public static IotSingleton getInstance(Context context) {
         if (mInstance == null)
@@ -36,16 +39,18 @@ public class IotSingleton {
     private IMessageCallback mInternalCb;
 
     private IotSingleton(Context context) {
-        this.mContext = context;
+        this.mContext = context.getApplicationContext();
     }
 
     public void setupDevice(String orgID, String deviceType, String deviceId, String authenticationToken) {
 
     }
 
-    public void setupApplication(String appID, String orgID, String apiKey, String apiToken) {
+    public void setupApplication(String appID, String orgID, String apiKey, String apiToken, boolean useSSL, boolean reconnectAuto) {
 
-        disconnect();
+        this.reconnectAuto = reconnectAuto;
+
+        disconnect(false);
         if (mIotCallback != null) {
             mHandler.removeCallback(mIotCallback);
         }
@@ -63,7 +68,7 @@ public class IotSingleton {
                 if (cause != null) {
                     Log.e(TAG, "connection lost : " + cause.getMessage());
                 }
-                if (!exit) {
+                if (!exit && IotSingleton.this.reconnectAuto) {
                     Log.i(TAG, "trying to reconnect");
                     mHandler.connect();
                 } else {
@@ -122,7 +127,7 @@ public class IotSingleton {
 
         mHandler.addIotCallback(mIotCallback);
 
-        mHandler.setSSL(true);
+        mHandler.setSSL(useSSL);
     }
 
     public void setInternalCb(IMessageCallback callback) {
@@ -138,12 +143,18 @@ public class IotSingleton {
         return false;
     }
 
-    public boolean disconnect() {
+    public boolean disconnect(boolean reconnect) {
 
+        if (!reconnect)
+            exit = true;
         if (mHandler != null && mHandler.isConnected()) {
             mHandler.disconnect();
             return true;
         }
         return false;
+    }
+
+    public boolean isAutoReconnect() {
+        return autoReconnect;
     }
 }
