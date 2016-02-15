@@ -354,10 +354,15 @@ public void onPause() {
 * https://github.com/ibm-messaging/iotf-rtd/blob/master/docs/devices/mqtt.rst
 * https://github.com/ibm-messaging/iotf-rtd/blob/master/docs/gateways/mqtt.rst
 
+## References
+
+An Android starter kit implementing a MQTT "device" client :
+
+* https://github.com/ibm-messaging/iot-starter-for-android
+
 ## External Libraries
 
 * <a href="http://www.eclipse.org/paho/">Eclipse Paho MQTT open source client</a>
-* <a href="https://commons.apache.org/proper/commons-net/">Apache commons-net</a>
 
 ## License
 
