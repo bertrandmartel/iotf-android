@@ -56,6 +56,8 @@ import fr.bmartel.android.iotf.app.singleton.IotSingleton;
 import fr.bmartel.android.iotf.listener.IMessageCallback;
 
 /**
+ * Notification activity
+ *
  * @author Bertrand Martel
  */
 public class NotificationActivity extends BaseActivity implements INotificationFilter, IPhoneNotificationListener {
@@ -63,10 +65,17 @@ public class NotificationActivity extends BaseActivity implements INotificationF
     private static final String TAG = NotificationActivity.class.getSimpleName();
 
     private ListView notificationListview;
+
     private NotificationArrayAdapter notificationAdapter;
 
+    /**
+     * list if all received notifications
+     */
     private ArrayList<IncomingMessage> notificationItems = new ArrayList<>();
 
+    /**
+     * list of notification filter values
+     */
     private List<NotificationFilter> messageBodyFilterList = new ArrayList<>();
 
     private boolean init = true;
