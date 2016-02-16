@@ -3,9 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/edit_phone_notification"
+        android:icon="@drawable/edit"
+        android:title="edit phone notification"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/notification_button"
+        android:icon="@drawable/plus"
+        android:title="setup notification"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/disconnect_button"
-        android:icon="@drawable/disconnect"
+        android:icon="@drawable/disconnect3"
         android:title="disconnect"
         android:visible="true"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 </menu>

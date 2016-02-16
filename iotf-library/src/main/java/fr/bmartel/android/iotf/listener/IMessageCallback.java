@@ -24,6 +24,7 @@
 package fr.bmartel.android.iotf.listener;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 /**
@@ -58,21 +59,31 @@ public interface IMessageCallback {
 
     /**
      * Called when connection is established
+     *
+     * @param iMqttToken token for this connection
      */
-    void onConnectionSuccess();
+    void onConnectionSuccess(IMqttToken iMqttToken);
 
     /**
      * Called when connection has failed
+     *
+     * @param iMqttToken token when failure occured
+     * @param throwable  exception
      */
-    void onConnectionFailure();
+    void onConnectionFailure(IMqttToken iMqttToken, Throwable throwable);
 
     /**
      * Called when disconnection is successfull
+     *
+     * @param iMqttToken token for this connection
      */
-    void onDisconnectionSuccess();
+    void onDisconnectionSuccess(IMqttToken iMqttToken);
 
     /**
      * Called when disconnection failed
+     *
+     * @param iMqttToken token when failure occured
+     * @param throwable  exception
      */
-    void onDisconnectionFailure();
+    void onDisconnectionFailure(IMqttToken iMqttToken, Throwable throwable);
 }

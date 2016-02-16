@@ -4,8 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import fr.bmartel.android.iotf.handler.AppHandler;
 import fr.bmartel.android.iotf.listener.IMessageCallback;
@@ -27,6 +32,8 @@ public class IotSingleton {
 
     private boolean reconnectAuto = true;
 
+    private static int RECONNECT_INTERVAL = 1;
+
     private IMessageCallback mIotCallback;
     private boolean autoReconnect;
 
@@ -45,6 +52,8 @@ public class IotSingleton {
     public void setupDevice(String orgID, String deviceType, String deviceId, String authenticationToken) {
 
     }
+
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public void setupApplication(String appID, String orgID, String apiKey, String apiToken, boolean useSSL, boolean reconnectAuto) {
 
@@ -69,8 +78,15 @@ public class IotSingleton {
                     Log.e(TAG, "connection lost : " + cause.getMessage());
                 }
                 if (!exit && IotSingleton.this.reconnectAuto) {
-                    Log.i(TAG, "trying to reconnect");
-                    mHandler.connect();
+
+                    scheduler.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "trying to reconnect");
+                            mHandler.connect();
+                        }
+                    }, RECONNECT_INTERVAL, TimeUnit.SECONDS);
+
                 } else {
                     Log.i(TAG, "not trying to reconnect");
                 }
@@ -95,33 +111,33 @@ public class IotSingleton {
             }
 
             @Override
-            public void onConnectionSuccess() {
+            public void onConnectionSuccess(IMqttToken token) {
                 if (mInternalCb != null)
-                    mInternalCb.onConnectionSuccess();
+                    mInternalCb.onConnectionSuccess(token);
                 exit = false;
                 Log.i(TAG, "subscribe to device events ...");
                 mHandler.subscribeDeviceEvents("+", "+", "+");
             }
 
             @Override
-            public void onConnectionFailure() {
+            public void onConnectionFailure(IMqttToken token, Throwable throwable) {
                 if (mInternalCb != null)
-                    mInternalCb.onConnectionFailure();
+                    mInternalCb.onConnectionFailure(token, throwable);
             }
 
             @Override
-            public void onDisconnectionSuccess() {
+            public void onDisconnectionSuccess(IMqttToken token) {
                 if (mInternalCb != null)
-                    mInternalCb.onDisconnectionSuccess();
+                    mInternalCb.onDisconnectionSuccess(token);
                 if (exit) {
                     mHandler.removeCallback(mIotCallback);
                 }
             }
 
             @Override
-            public void onDisconnectionFailure() {
+            public void onDisconnectionFailure(IMqttToken token, Throwable throwable) {
                 if (mInternalCb != null)
-                    mInternalCb.onDisconnectionFailure();
+                    mInternalCb.onDisconnectionFailure(token, throwable);
             }
         };
 

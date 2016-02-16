@@ -30,4 +30,8 @@ public class IncomingMessage {
     public Date getDate() {
         return mDate;
     }
+
+    public String getDeviceId() {
+        return "";
+    }
 }

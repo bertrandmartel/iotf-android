@@ -21,7 +21,15 @@
             android:id="@+id/notification_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="singleChoice" />
+            android:choiceMode="singleChoice"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/no_notification_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_notification" />
 
     </LinearLayout>
 

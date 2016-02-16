@@ -27,14 +27,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,17 +54,21 @@ public class ConnectActivity extends BaseActivity {
 
     private static final String TAG = ConnectActivity.class.getSimpleName();
 
-    private Button mButtonConnect;
-
     private RandomString randomId = new RandomString(30);
 
-    private TextView errorLogTv;
+    private EditText mOrganizationEditText;
+
+    private EditText mApikeyEditText;
+
+    private EditText mApitokenEditText;
+
+    private CheckBox mSslCheckbox;
+
+    private CheckBox mReconnectCheckbox;
 
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.activity_connect);
-
-        SharedPreferences sharedpreferences = getSharedPreferences(StorageConst.STORAGE_PROFILE, Context.MODE_PRIVATE);
 
         final Intent intent = getIntent();
 
@@ -118,30 +122,19 @@ public class ConnectActivity extends BaseActivity {
 
         ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
 
-        final EditText organization = (EditText) scrollView.findViewById(R.id.organization);
-        final EditText api_key = (EditText) scrollView.findViewById(R.id.api_key);
-        final EditText api_token = (EditText) scrollView.findViewById(R.id.api_token);
-        organization.setText(organizationId);
-        api_key.setText(apiKey);
-        api_token.setText(apiToken);
-        final CheckBox sslCheckbox = (CheckBox) scrollView.findViewById(R.id.ssl);
-        sslCheckbox.setChecked(ssl);
-        final CheckBox reconnectCheckbox = (CheckBox) scrollView.findViewById(R.id.reconnect);
-        reconnectCheckbox.setChecked(true);
-
-        mButtonConnect = (Button) scrollView.findViewById(R.id.button_connect);
-
-        mButtonConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                IotSingleton.getInstance(ConnectActivity.this).setupApplication(randomId.nextString(), organization.getText().toString(),
-                        api_key.getText().toString(), api_token.getText().toString(), sslCheckbox.isChecked(), reconnectCheckbox.isChecked());
-                IotSingleton.getInstance(ConnectActivity.this).connect();
-            }
-        });
+        mOrganizationEditText = (EditText) scrollView.findViewById(R.id.organization);
+        mApikeyEditText = (EditText) scrollView.findViewById(R.id.api_key);
+        mApitokenEditText = (EditText) scrollView.findViewById(R.id.api_token);
+        mOrganizationEditText.setText(organizationId);
+        mApikeyEditText.setText(apiKey);
+        mApitokenEditText.setText(apiToken);
+        mSslCheckbox = (CheckBox) scrollView.findViewById(R.id.ssl);
+        mSslCheckbox.setChecked(ssl);
+        mReconnectCheckbox = (CheckBox) scrollView.findViewById(R.id.reconnect);
+        mReconnectCheckbox.setChecked(true);
 
         if (fromJsonFile) {
-            mButtonConnect.performClick();
+            connect();
         }
 
         initNv();
@@ -174,8 +167,6 @@ public class ConnectActivity extends BaseActivity {
 
         hideSoftKeyboard();
 
-        errorLogTv = (TextView) findViewById(R.id.error_log);
-
         IotSingleton.getInstance(this).setInternalCb(new IMessageCallback() {
 
             @Override
@@ -194,26 +185,30 @@ public class ConnectActivity extends BaseActivity {
             }
 
             @Override
-            public void onConnectionSuccess() {
-                errorLogTv.setText("");
+            public void onConnectionSuccess(IMqttToken token) {
                 //go to notification activity
+                Toast.makeText(ConnectActivity.this, "connnected to server", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(ConnectActivity.this, NotificationActivity.class);
                 startActivity(i);
             }
 
             @Override
-            public void onConnectionFailure() {
+            public void onConnectionFailure(IMqttToken token, Throwable throwable) {
                 //display error message
-                errorLogTv.setText("connection failure");
+                String errorMessage = "connection error";
+                if (throwable != null && throwable.getMessage() != null) {
+                    errorMessage = throwable.getMessage();
+                }
+                Toast.makeText(ConnectActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onDisconnectionSuccess() {
+            public void onDisconnectionSuccess(IMqttToken token) {
 
             }
 
             @Override
-            public void onDisconnectionFailure() {
+            public void onDisconnectionFailure(IMqttToken token, Throwable throwable) {
 
             }
         });
@@ -221,11 +216,44 @@ public class ConnectActivity extends BaseActivity {
 
     @Override
     public String getToolbarTitle() {
-        return "Connection configuration";
+        return "IoT Foundation connection configuration";
     }
 
     @Override
     public boolean isShowingDisconnectBtn() {
+        return true;
+    }
+
+    @Override
+    public boolean isShowingNotificationBtn() {
         return false;
+    }
+
+    @Override
+    public boolean isShowingEditPhoneNotification() {
+        return false;
+    }
+
+    @Override
+    public void displayDisconnect(MenuItem menuItem) {
+        menuItem.setIcon(R.drawable.disconnect3);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.disconnect_button:
+                connect();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void connect() {
+        IotSingleton.getInstance(ConnectActivity.this).setupApplication(randomId.nextString(), mOrganizationEditText.getText().toString(),
+                mApikeyEditText.getText().toString(), mApitokenEditText.getText().toString(), mSslCheckbox.isChecked(), mReconnectCheckbox.isChecked());
+        IotSingleton.getInstance(ConnectActivity.this).connect();
     }
 }

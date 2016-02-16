@@ -12,4 +12,5 @@
     <string name="github_link">https://github.com/akinaru/iotf-android</string>
     <string name="open_source_items">Open Source components</string>
     <string name="application_title">Application</string>
+    <string name="no_notification">No recent notifications</string>
 </resources>
