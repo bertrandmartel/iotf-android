@@ -23,7 +23,6 @@
  */
 package fr.bmartel.android.iotf.app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -48,6 +47,8 @@ import fr.bmartel.android.iotf.app.utils.RandomString;
 import fr.bmartel.android.iotf.listener.IMessageCallback;
 
 /**
+ * Connection activity : configure connection
+ *
  * @author Bertrand Martel
  */
 public class ConnectActivity extends BaseActivity {
@@ -140,6 +141,12 @@ public class ConnectActivity extends BaseActivity {
         initNv();
     }
 
+    /**
+     * Load URI file
+     *
+     * @param intent
+     * @return
+     */
     private String loadFile(Intent intent) {
         try {
             BufferedReader buffer = new BufferedReader(new InputStreamReader(getContentResolver().openInputStream(intent.getData())));

@@ -38,6 +38,8 @@ import fr.bmartel.android.iotf.app.R;
 import fr.bmartel.android.iotf.app.model.IncomingMessage;
 
 /**
+ * Adapter for Phone notification creation Dialog
+ *
  * @author Bertrand Martel
  */
 public class NotificationArrayAdapter extends BaseAdapter {

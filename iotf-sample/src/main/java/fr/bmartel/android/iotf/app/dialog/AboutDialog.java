@@ -11,7 +11,9 @@ import android.widget.TextView;
 import fr.bmartel.android.iotf.app.R;
 
 /**
- * Created by akinaru on 09/02/16.
+ * About Dialog
+ *
+ * @author Bertrand Martel
  */
 public class AboutDialog extends AlertDialog {
 

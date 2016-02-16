@@ -1,3 +1,26 @@
+/**
+ * The MIT License (MIT)
+ * <p/>
+ * Copyright (c) 2016 Bertrand Martel
+ * <p/>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p/>
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * <p/>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package fr.bmartel.android.iotf.app;
 
 import android.app.NotificationManager;
@@ -15,7 +38,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
@@ -32,7 +54,9 @@ import fr.bmartel.android.iotf.app.dialog.OpenSourceItemsDialog;
 import fr.bmartel.android.iotf.app.inter.IBaseActivity;
 
 /**
- * Created by akinaru on 15/02/16.
+ * Common abstract activity
+ *
+ * @author Bertrand Martel
  */
 public abstract class BaseActivity extends AppCompatActivity implements IBaseActivity {
 
@@ -45,10 +69,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
     protected NavigationView nvDrawer;
 
     private NotificationManager notifyMgr = null;
-
-    private int mNotificationCount = 0;
-
-    private int mNotificationId = 1337;
 
     private Ringtone ringtone;
 
@@ -113,7 +133,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
         return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open, R.string.drawer_close);
     }
 
-
+    /**
+     * Build listener for navigation view
+     *
+     * @param navigationView
+     */
     protected void setupDrawerContent(NavigationView navigationView) {
 
         navigationView.setNavigationItemSelectedListener(
@@ -149,12 +173,17 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
         }
     }
 
+    /**
+     * process menu item selected
+     *
+     * @param menuItem
+     * @param mDrawer
+     * @param context
+     */
     protected void selectDrawerItem(MenuItem menuItem, DrawerLayout mDrawer, Context context) {
 
-        Log.i("test", "selectDrawerItem");
         switch (menuItem.getItemId()) {
             case R.id.report_bugs: {
-                Log.i("test", "report_bugs");
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
                         "mailto", "kiruazoldik92@gmail.com", null));
                 intent.putExtra(Intent.EXTRA_SUBJECT, "iotf Issue");
@@ -177,6 +206,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
         mDrawer.closeDrawers();
     }
 
+    /**
+     * create a notification with defined message
+     *
+     * @param message notification message
+     */
     protected void triggerNotification(String message) {
 
         Intent intent = new Intent(this, ConnectActivity.class);
@@ -199,6 +233,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
         notifyMgr.notify(0, n.build());
     }
 
+    /**
+     * Convert notification list to Json string
+     *
+     * @param filterList
+     * @return
+     */
     protected String convertNotificationFilterListToJsonArrayStr(List<NotificationFilter> filterList) {
         JSONArray array = new JSONArray();
         try {

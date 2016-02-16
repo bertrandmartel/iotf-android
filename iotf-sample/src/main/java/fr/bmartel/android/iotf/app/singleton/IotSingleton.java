@@ -1,3 +1,26 @@
+/**
+ * The MIT License (MIT)
+ * <p/>
+ * Copyright (c) 2016 Bertrand Martel
+ * <p/>
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * <p/>
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * <p/>
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package fr.bmartel.android.iotf.app.singleton;
 
 import android.content.Context;
@@ -16,7 +39,9 @@ import fr.bmartel.android.iotf.handler.AppHandler;
 import fr.bmartel.android.iotf.listener.IMessageCallback;
 
 /**
- * Created by akinaru on 15/02/16.
+ * Singleton for Iot Foundation wrapper
+ *
+ * @author Bertrand Martel
  */
 public class IotSingleton {
 
@@ -26,16 +51,31 @@ public class IotSingleton {
 
     private Context mContext;
 
+    /**
+     * IoT Foundation Application Handler
+     */
     private AppHandler mHandler;
 
+    /**
+     * control for auto reconnection
+     */
     private boolean exit = false;
 
+    /**
+     * define if app will reconnect automatically if connection is lost
+     */
     private boolean reconnectAuto = true;
 
+    /**
+     * reconnection interval in second
+     */
     private static int RECONNECT_INTERVAL = 1;
 
+    /**
+     * callback for IoT Foundation wrapper
+     */
     private IMessageCallback mIotCallback;
-    private boolean autoReconnect;
+
 
     public static IotSingleton getInstance(Context context) {
         if (mInstance == null)
@@ -49,12 +89,18 @@ public class IotSingleton {
         this.mContext = context.getApplicationContext();
     }
 
-    public void setupDevice(String orgID, String deviceType, String deviceId, String authenticationToken) {
-
-    }
-
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    /**
+     * Connect as an application with defined connection params
+     *
+     * @param appID         application ID
+     * @param orgID         organization ID
+     * @param apiKey        API KEY
+     * @param apiToken      API TOKEN
+     * @param useSSL        define if SSL is used or plain HTTP
+     * @param reconnectAuto define if app will reconnect if connection is lost
+     */
     public void setupApplication(String appID, String orgID, String apiKey, String apiToken, boolean useSSL, boolean reconnectAuto) {
 
         this.reconnectAuto = reconnectAuto;
@@ -150,6 +196,11 @@ public class IotSingleton {
         mInternalCb = callback;
     }
 
+    /**
+     * connect to MQTT server
+     *
+     * @return
+     */
     public boolean connect() {
 
         if (mHandler != null) {
@@ -159,6 +210,12 @@ public class IotSingleton {
         return false;
     }
 
+    /**
+     * disconnect from MQTT server
+     *
+     * @param reconnect define if app will reconnect after disconnection
+     * @return
+     */
     public boolean disconnect(boolean reconnect) {
 
         if (!reconnect)
@@ -171,6 +228,6 @@ public class IotSingleton {
     }
 
     public boolean isAutoReconnect() {
-        return autoReconnect;
+        return reconnectAuto;
     }
 }
