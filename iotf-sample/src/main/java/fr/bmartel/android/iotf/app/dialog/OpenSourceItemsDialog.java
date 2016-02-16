@@ -1,6 +1,5 @@
 package fr.bmartel.android.iotf.app.dialog;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -16,13 +15,7 @@ import fr.bmartel.android.iotf.app.adapter.OpenSourceItemAdapter;
  */
 public class OpenSourceItemsDialog extends android.support.v4.app.DialogFragment {
 
-    private Context mContext;
-
     public OpenSourceItemsDialog() {
-    }
-
-    public OpenSourceItemsDialog(Context context) {
-        mContext = context;
     }
 
     private ListView mList;
@@ -31,12 +24,17 @@ public class OpenSourceItemsDialog extends android.support.v4.app.DialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View mView = inflater.inflate(R.layout.open_source_list, container, false);
+        View mView = inflater.inflate(R.layout.open_source_list, null);
 
         mList = (ListView) mView.findViewById(R.id.open_source_listview);
-        mList.setAdapter(new OpenSourceItemAdapter(mContext));
+        if (mList != null) {
 
+            OpenSourceItemAdapter adapter = new OpenSourceItemAdapter();
+            adapter.setContext(getActivity());
+            mList.setAdapter(adapter);
+        }
         getDialog().setTitle(R.string.open_source_items);
+
         return mView;
     }
 

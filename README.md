@@ -356,7 +356,7 @@ public void onPause() {
 
 ## References
 
-An Android starter kit implementing a MQTT "device" client :
+An Android starter kit implementing a MQTT Device client :
 
 * https://github.com/ibm-messaging/iot-starter-for-android
 

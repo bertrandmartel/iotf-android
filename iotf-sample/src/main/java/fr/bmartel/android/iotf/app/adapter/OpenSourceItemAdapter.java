@@ -21,7 +21,10 @@ public class OpenSourceItemAdapter extends BaseAdapter {
 
     private Context mContext;
 
-    public OpenSourceItemAdapter(Context context) {
+    public OpenSourceItemAdapter() {
+    }
+
+    public void setContext(Context context) {
         mContext = context;
     }
 
@@ -46,7 +49,7 @@ public class OpenSourceItemAdapter extends BaseAdapter {
         try {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            convertView = inflater.inflate(R.layout.open_source_items, parent, false);
+            convertView = inflater.inflate(R.layout.open_source_items, null);
 
             TextView title = (TextView) convertView.findViewById(R.id.title);
             TextView url = (TextView) convertView.findViewById(R.id.url);

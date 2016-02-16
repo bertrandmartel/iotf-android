@@ -46,9 +46,12 @@ public class NotificationArrayAdapter extends BaseAdapter {
 
     private SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
 
-    public NotificationArrayAdapter(List<IncomingMessage> objects) {
+    private Context mContext;
+
+    public NotificationArrayAdapter(List<IncomingMessage> objects, Context context) {
 
         this.notificationList = objects;
+        mContext = context;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -56,10 +59,10 @@ public class NotificationArrayAdapter extends BaseAdapter {
         final ViewHolder holder;
 
         try {
-            LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.notification_item, parent, false);
+                convertView = inflater.inflate(R.layout.notification_item, null);
                 holder = new ViewHolder();
 
                 holder.date = (TextView) convertView.findViewById(R.id.date);

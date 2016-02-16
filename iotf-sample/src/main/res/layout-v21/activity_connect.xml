@@ -13,9 +13,7 @@
         android:orientation="vertical">
 
         <include
-            layout="@layout/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?actionBarSize" />
+            layout="@layout/toolbar" />
 
         <ScrollView
             android:id="@+id/scrollview"
@@ -27,10 +25,11 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp">
+
 
                 <TextView
                     android:id="@+id/title"
@@ -54,7 +53,7 @@
                     android:inputType="textCapWords"
                     android:padding="10dp"
                     android:singleLine="true"
-                    android:textColor="@color/input_register"
+                    android:textColor="@android:color/black"
                     android:textColorHint="@color/input_register_hint"
                     android:textCursorDrawable="@null" />
 
@@ -69,7 +68,7 @@
                     android:inputType="textEmailAddress"
                     android:padding="10dp"
                     android:singleLine="true"
-                    android:textColor="@color/input_register"
+                    android:textColor="@android:color/black"
                     android:textColorHint="@color/input_register_hint"
                     android:textCursorDrawable="@null" />
 
@@ -84,54 +83,31 @@
                     android:inputType="textPassword"
                     android:padding="10dp"
                     android:singleLine="true"
-                    android:textColor="@color/input_register"
+                    android:textColor="@android:color/black"
                     android:textColorHint="@color/input_register_hint"
                     android:textCursorDrawable="@null" />
 
                 <!-- Login Button -->
 
-                <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
-                    <TableRow>
+                    <CheckBox
+                        android:id="@+id/ssl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="use SSL" />
 
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/ssl"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="use SSL" />
+                    <CheckBox
+                        android:id="@+id/reconnect"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="50dp"
+                        android:text="reconnect auto" />
 
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/reconnect"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="reconnect auto" />
-
-
-                    </TableRow>
-
-                </TableLayout>
-
-                <Button
-                    android:id="@+id/button_connect"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dip"
-                    android:background="@drawable/ripple"
-                    android:fontFamily="sans-serif"
-                    android:text="@string/validate"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/error_log"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:padding="10dp"
-                    android:textColor="#FF0000" />
+                </LinearLayout>
 
             </LinearLayout>
         </ScrollView>

@@ -256,14 +256,14 @@ public abstract class IotHandlerAbstr implements IHandler {
                         connected = true;
                         connectionState = ConnectionState.NONE;
                         for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onConnectionSuccess();
+                            mMessageCallbacksList.get(i).onConnectionSuccess(iMqttToken);
                         }
                     } else if (connectionState == ConnectionState.DISCONNECTING) {
                         Log.i(TAG, "disconnection success");
                         connected = true;
                         connectionState = ConnectionState.NONE;
                         for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onDisconnectionSuccess();
+                            mMessageCallbacksList.get(i).onDisconnectionSuccess(iMqttToken);
                         }
                     }
                 }
@@ -276,14 +276,14 @@ public abstract class IotHandlerAbstr implements IHandler {
                         connected = false;
                         connectionState = ConnectionState.NONE;
                         for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onConnectionFailure();
+                            mMessageCallbacksList.get(i).onConnectionFailure(iMqttToken, throwable);
                         }
                     } else if (connectionState == ConnectionState.DISCONNECTING) {
                         Log.e(TAG, "disconnection failure : " + iMqttToken.getException().getMessage());
                         connected = false;
                         connectionState = ConnectionState.NONE;
                         for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onDisconnectionFailure();
+                            mMessageCallbacksList.get(i).onDisconnectionFailure(iMqttToken, throwable);
                         }
                     }
                 }

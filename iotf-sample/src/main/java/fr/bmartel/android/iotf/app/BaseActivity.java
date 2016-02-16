@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -19,6 +20,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import fr.bmartel.android.iotf.app.constant.StorageConst;
 import fr.bmartel.android.iotf.app.dialog.AboutDialog;
 import fr.bmartel.android.iotf.app.dialog.OpenSourceItemsDialog;
 import fr.bmartel.android.iotf.app.inter.IBaseActivity;
@@ -46,8 +54,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
 
     private PowerManager.WakeLock screenLock;
 
+    protected SharedPreferences sharedpreferences;
+
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
+
+        sharedpreferences = getSharedPreferences(StorageConst.STORAGE_PROFILE, Context.MODE_PRIVATE);
 
         notifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
@@ -119,6 +131,11 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
         super.onPrepareOptionsMenu(menu);
         if (menu.findItem(R.id.disconnect_button) != null)
             menu.findItem(R.id.disconnect_button).setVisible(isShowingDisconnectBtn());
+        if (menu.findItem(R.id.notification_button) != null)
+            menu.findItem(R.id.notification_button).setVisible(isShowingNotificationBtn());
+        if (menu.findItem(R.id.edit_phone_notification) != null)
+            menu.findItem(R.id.edit_phone_notification).setVisible(isShowingEditPhoneNotification());
+        displayDisconnect(menu.findItem(R.id.disconnect_button));
         return true;
     }
 
@@ -146,7 +163,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
                 break;
             }
             case R.id.open_source_components: {
-                OpenSourceItemsDialog d = new OpenSourceItemsDialog(context);
+                OpenSourceItemsDialog d = new OpenSourceItemsDialog();
                 android.support.v4.app.FragmentManager manager = getSupportFragmentManager();
                 d.show(manager, "open_source_components");
                 break;
@@ -182,4 +199,18 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseAct
         notifyMgr.notify(0, n.build());
     }
 
+    protected String convertNotificationFilterListToJsonArrayStr(List<NotificationFilter> filterList) {
+        JSONArray array = new JSONArray();
+        try {
+            for (int i = 0; i < filterList.size(); i++) {
+                JSONObject item = new JSONObject();
+                item.put(StorageConst.STORAGE_NOTIFICATION_BODY, filterList.get(i).getFilter());
+                item.put(StorageConst.STORAGE_NOTIFICATION_MESSAGE, filterList.get(i).getNotificationMessage());
+                array.put(item);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return array.toString();
+    }
 }
