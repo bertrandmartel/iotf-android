@@ -204,99 +204,103 @@ public abstract class IotHandlerAbstr implements IHandler {
     @Override
     public void connect() {
 
-        if (!isConnected()) {
+        try {
+            if (!isConnected()) {
 
-            MqttConnectOptions options = new MqttConnectOptions();
+                MqttConnectOptions options = new MqttConnectOptions();
 
-            String serverURI = "";
+                String serverURI = "";
 
-            options.setCleanSession(mCleanSessionDefault);
-            options.setConnectionTimeout(mTimeoutDefault);
-            options.setKeepAliveInterval(mKeepAliveDefault);
+                options.setCleanSession(mCleanSessionDefault);
+                options.setConnectionTimeout(mTimeoutDefault);
+                options.setKeepAliveInterval(mKeepAliveDefault);
 
-            options.setUserName(mUsername);
-            options.setPassword(mPassword.toCharArray());
+                options.setUserName(mUsername);
+                options.setPassword(mPassword.toCharArray());
 
-            if (mUseSsl) {
+                if (mUseSsl) {
 
-                Log.d(TAG, "using ssl");
+                    Log.d(TAG, "using ssl");
 
-                serverURI = "ssl://" + mOrgId + "." + MqttConst.URL_SUFFIX + ":" + MqttConst.PORT_ENCRYPTED2;
+                    serverURI = "ssl://" + mOrgId + "." + MqttConst.URL_SUFFIX + ":" + MqttConst.PORT_ENCRYPTED2;
+
+                    try {
+                        ProviderInstaller.installIfNeeded(mContext);
+
+                        SSLContext sslContext;
+                        KeyStore ks = KeyStore.getInstance("bks");
+                        ks.load(mContext.getResources().openRawResource(R.raw.iot), "password".toCharArray());
+                        TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
+                        tmf.init(ks);
+                        TrustManager[] tm = tmf.getTrustManagers();
+                        sslContext = SSLContext.getInstance("TLSv1.2");
+                        sslContext.init(null, tm, null);
+
+                        options.setSocketFactory(sslContext.getSocketFactory());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    serverURI = "tcp://" + mOrgId + "." + MqttConst.URL_SUFFIX + ":" + MqttConst.PORT_UNENCRYPTED;
+                }
+
+                mClient = new MqttAndroidClient(mContext, serverURI, mClientId);
+                mClient.setCallback(mClientCb);
+
+                mConnectionCb = new IMqttActionListener() {
+                    @Override
+                    public void onSuccess(IMqttToken iMqttToken) {
+
+                        if (connectionState == ConnectionState.CONNECTING) {
+                            Log.i(TAG, "connection success");
+                            connected = true;
+                            connectionState = ConnectionState.NONE;
+                            for (int i = 0; i < mMessageCallbacksList.size(); i++) {
+                                mMessageCallbacksList.get(i).onConnectionSuccess(iMqttToken);
+                            }
+                        } else if (connectionState == ConnectionState.DISCONNECTING) {
+                            Log.i(TAG, "disconnection success");
+                            connected = true;
+                            connectionState = ConnectionState.NONE;
+                            for (int i = 0; i < mMessageCallbacksList.size(); i++) {
+                                mMessageCallbacksList.get(i).onDisconnectionSuccess(iMqttToken);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
+
+                        if (connectionState == ConnectionState.CONNECTING) {
+                            Log.e(TAG, "connection failure : " + iMqttToken.getException().getMessage());
+                            connected = false;
+                            connectionState = ConnectionState.NONE;
+                            for (int i = 0; i < mMessageCallbacksList.size(); i++) {
+                                mMessageCallbacksList.get(i).onConnectionFailure(iMqttToken, throwable);
+                            }
+                        } else if (connectionState == ConnectionState.DISCONNECTING) {
+                            Log.e(TAG, "disconnection failure : " + iMqttToken.getException().getMessage());
+                            connected = false;
+                            connectionState = ConnectionState.NONE;
+                            for (int i = 0; i < mMessageCallbacksList.size(); i++) {
+                                mMessageCallbacksList.get(i).onDisconnectionFailure(iMqttToken, throwable);
+                            }
+                        }
+                    }
+                };
 
                 try {
-                    ProviderInstaller.installIfNeeded(mContext);
-
-                    SSLContext sslContext;
-                    KeyStore ks = KeyStore.getInstance("bks");
-                    ks.load(mContext.getResources().openRawResource(R.raw.iot), "password".toCharArray());
-                    TrustManagerFactory tmf = TrustManagerFactory.getInstance("X509");
-                    tmf.init(ks);
-                    TrustManager[] tm = tmf.getTrustManagers();
-                    sslContext = SSLContext.getInstance("TLSv1.2");
-                    sslContext.init(null, tm, null);
-
-                    options.setSocketFactory(sslContext.getSocketFactory());
-
-                } catch (Exception e) {
+                    connectionState = ConnectionState.CONNECTING;
+                    mClient.connect(options, mContext, mConnectionCb);
+                } catch (MqttException e) {
                     e.printStackTrace();
                 }
             } else {
-                serverURI = "tcp://" + mOrgId + "." + MqttConst.URL_SUFFIX + ":" + MqttConst.PORT_UNENCRYPTED;
+                Log.i(TAG, "cant connect - already connected");
             }
-
-            mClient = new MqttAndroidClient(mContext, serverURI, mClientId);
-            mClient.setCallback(mClientCb);
-
-            mConnectionCb = new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken iMqttToken) {
-
-                    if (connectionState == ConnectionState.CONNECTING) {
-                        Log.i(TAG, "connection success");
-                        connected = true;
-                        connectionState = ConnectionState.NONE;
-                        for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onConnectionSuccess(iMqttToken);
-                        }
-                    } else if (connectionState == ConnectionState.DISCONNECTING) {
-                        Log.i(TAG, "disconnection success");
-                        connected = true;
-                        connectionState = ConnectionState.NONE;
-                        for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onDisconnectionSuccess(iMqttToken);
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(IMqttToken iMqttToken, Throwable throwable) {
-
-                    if (connectionState == ConnectionState.CONNECTING) {
-                        Log.e(TAG, "connection failure : " + iMqttToken.getException().getMessage());
-                        connected = false;
-                        connectionState = ConnectionState.NONE;
-                        for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onConnectionFailure(iMqttToken, throwable);
-                        }
-                    } else if (connectionState == ConnectionState.DISCONNECTING) {
-                        Log.e(TAG, "disconnection failure : " + iMqttToken.getException().getMessage());
-                        connected = false;
-                        connectionState = ConnectionState.NONE;
-                        for (int i = 0; i < mMessageCallbacksList.size(); i++) {
-                            mMessageCallbacksList.get(i).onDisconnectionFailure(iMqttToken, throwable);
-                        }
-                    }
-                }
-            };
-
-            try {
-                connectionState = ConnectionState.CONNECTING;
-                mClient.connect(options, mContext, mConnectionCb);
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.i(TAG, "cant connect - already connected");
+        } catch (IllegalArgumentException e) {
+            Log.i(TAG, "parameters error. cant connect");
         }
     }
 
