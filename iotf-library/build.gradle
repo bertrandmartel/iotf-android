@@ -35,7 +35,7 @@ publish {
     userOrg = 'akinaru'
     groupId = 'akinaru'
     artifactId = 'iotf-android'
-    publishVersion = '0.2'
+    publishVersion = '0.3'
     desc = 'iotf android library Release'
     website = 'https://github.com/akinaru/iotf-android'
 }
