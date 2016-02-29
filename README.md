@@ -25,7 +25,7 @@ From there you can manage :
 ## Include into your project
 
 ```
-compile 'akinaru:iotf-android:0.1'
+compile 'akinaru:iotf-android:0.2'
 ```
 
 ## Usage
