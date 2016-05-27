@@ -25,7 +25,7 @@ From there you can manage :
 ## Include into your project
 
 ```
-compile 'akinaru:iotf-android:0.2'
+compile 'akinaru:iotf-android:0.3'
 ```
 
 ## Usage
@@ -359,7 +359,7 @@ If you want to include one of theses libraries in your project, you can use an `
 ```
 compile 'com.google.android.gms:play-services:9.0.1'
 
-compile ('akinaru:iotf-android:0.2'){
+compile ('akinaru:iotf-android:0.3'){
    exclude group: 'com.google.android.gms'
 }
 ```
