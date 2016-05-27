@@ -347,6 +347,25 @@ public void onPause() {
 }
 ```
 
+## Library dependencies
+
+The following dependencies are included :
+* `com.google.android.gms:play-services:6.5.87`
+* `com.android.support:support-v4:22.1.0`
+* `org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.3-SNAPSHOT`
+
+If you want to include one of theses libraries in your project, you can use an `exclude` directive as following :
+
+```
+compile 'com.google.android.gms:play-services:9.0.1'
+
+compile ('akinaru:iotf-android:0.2'){
+   exclude group: 'com.google.android.gms'
+}
+```
+
+Note that Security Provider will update when `com.google.android.gms:play-services` current version is deprecated or a new update is available
+
 ## IBM Messaging Documentation 
 
 * https://github.com/ibm-messaging/iotf-rtd/blob/master/docs/getting_started/concepts.rst
