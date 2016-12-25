@@ -9,7 +9,7 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="about">About</string>
     <string name="copyright">\u00a9 2016 Bertrand Martel</string>
-    <string name="github_link">https://github.com/akinaru/iotf-android</string>
+    <string name="github_link">https://github.com/bertrandmartel/iotf-android</string>
     <string name="open_source_items">Open Source components</string>
     <string name="application_title">Application</string>
     <string name="no_notification">No recent notifications</string>

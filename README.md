@@ -1,7 +1,7 @@
 # IoT Foundation for Android
 
-[![Build Status](https://travis-ci.org/akinaru/iotf-android.svg?branch=master)](https://travis-ci.org/akinaru/iotf-android)
-[![Download](https://api.bintray.com/packages/akinaru/maven/iotf-android/images/download.svg) ](https://bintray.com/akinaru/maven/iotf-android/_latestVersion)
+[![Build Status](https://travis-ci.org/bertrandmartel/iotf-android.svg?branch=master)](https://travis-ci.org/bertrandmartel/iotf-android)
+[![Download](https://api.bintray.com/packages/bertrandmartel/maven/iotf-android/images/download.svg) ](https://bintray.com/bertrandmartel/maven/iotf-android/_latestVersion)
 [![License](http://img.shields.io/:license-mit-blue.svg)](LICENSE.md)
 
 IBM IoT foundation Messaging library for Android
@@ -25,7 +25,7 @@ From there you can manage :
 ## Include into your project
 
 ```
-compile 'akinaru:iotf-android:0.3'
+compile 'fr.bmartel:iotf-android:0.3'
 ```
 
 ## Usage
@@ -359,7 +359,7 @@ If you want to include one of theses libraries in your project, you can use an `
 ```
 compile 'com.google.android.gms:play-services:9.0.1'
 
-compile ('akinaru:iotf-android:0.3'){
+compile ('fr.bmartel:iotf-android:0.3'){
    exclude group: 'com.google.android.gms'
 }
 ```

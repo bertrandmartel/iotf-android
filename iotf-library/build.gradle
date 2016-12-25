@@ -32,10 +32,10 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.5.87'
 }
 publish {
-    userOrg = 'akinaru'
-    groupId = 'akinaru'
+    userOrg = 'bertrandmartel'
+    groupId = 'bertrandmartel'
     artifactId = 'iotf-android'
     publishVersion = '0.3'
     desc = 'iotf android library Release'
-    website = 'https://github.com/akinaru/iotf-android'
+    website = 'https://github.com/bertrandmartel/iotf-android'
 }
