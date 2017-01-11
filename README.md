@@ -25,7 +25,7 @@ From there you can manage :
 ## Include into your project
 
 ```
-compile 'fr.bmartel:iotf-android:0.3'
+compile 'fr.bmartel:iotf-library:0.3'
 ```
 
 ## Usage
