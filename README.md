@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/bertrandmartel/iotf-android.svg?branch=master)](https://travis-ci.org/bertrandmartel/iotf-android)
 [![Download](https://api.bintray.com/packages/bertrandmartel/maven/iotf-android/images/download.svg) ](https://bintray.com/bertrandmartel/maven/iotf-android/_latestVersion)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/fr.bmartel/iotf-library/badge.svg)](https://maven-badges.herokuapp.com/maven-central/fr.bmartel/iotf-library)
+[![Javadoc](http://javadoc-badge.appspot.com/fr.bmartel/iotf-library.svg?label=javadoc)](http://javadoc-badge.appspot.com/fr.bmartel/iotf-library)
 [![License](http://img.shields.io/:license-mit-blue.svg)](LICENSE.md)
 
 IBM IoT foundation Messaging library for Android
